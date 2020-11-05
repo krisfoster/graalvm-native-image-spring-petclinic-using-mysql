@@ -27,24 +27,24 @@ CP=BOOT-INF/classes:$LIBPATH
 GRAALVM_VERSION=`native-image --version`
 echo "Compiling $ARTIFACT with $GRAALVM_VERSION"
 { time native-image \
-  -H:+TraceClassInitialization \
-  -H:+ReportExceptionStackTraces \
   --enable-all-security-services \
-  -H:IncludeResourceBundles=oracle.net.jdbc.nl.mesg.NLSR,oracle.net.mesg.Message \
-  --allow-incomplete-classpath \
-	--initialize-at-build-time=oracle.net.jdbc.nl.mesg.NLSR_en \
-	--initialize-at-build-time=oracle.jdbc.driver.DynamicByteArray,oracle.sql.ConverterArchive,oracle.sql.converter.CharacterConverterJDBC,oracle.sql.converter.CharacterConverter1Byte \
-	--initialize-at-run-time=java.sql.DriverManager \
-  --initialize-at-build-time=java.awt.Toolkit \
-  --initialize-at-build-time=sun.awt.AWTAccessor \
   --no-fallback \
   --report-unsupported-elements-at-runtime \
   --install-exit-handlers \
   --no-server \
   --verbose \
+  --allow-incomplete-classpath \
+  -H:+TraceClassInitialization \
+  -H:+ReportExceptionStackTraces \
+  -H:IncludeResourceBundles=oracle.net.jdbc.nl.mesg.NLSR,oracle.net.mesg.Message \
+	--initialize-at-build-time=oracle.net.jdbc.nl.mesg.NLSR_en \
+	--initialize-at-build-time=oracle.jdbc.driver.DynamicByteArray,oracle.sql.ConverterArchive,oracle.sql.converter.CharacterConverterJDBC,oracle.sql.converter.CharacterConverter1Byte \
+	--initialize-at-run-time=java.sql.DriverManager \
+	--initialize-at-run-time=org.springframework.boot.context.properties.bind.Bindable \
+  --initialize-at-build-time=java.awt.Toolkit \
+  --initialize-at-build-time=sun.awt.AWTAccessor \
   -H:Name=$ARTIFACT \
   -Dspring.native.remove-yaml-support=true \
-  --enable-all-security-services \
   -cp $CP $MAINCLASS >> output.txt ; } 2>> output.txt
 
 if [[ -f $ARTIFACT ]]
