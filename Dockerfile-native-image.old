@@ -1,0 +1,50 @@
+#FROM oracle/graalvm-ce:20.2.0-java8 as graalvm
+FROM krisfoster/graal-ee-java11-ol:20.2.0 as graalvm
+
+USER vscode
+RUN mkdir -p /home/vscode/petclinic
+COPY . /home/vscode/petclinic
+WORKDIR /home/vscode/petclinic
+RUN sudo chown -R vscode:vscode /home/vscode/petclinic
+
+#RUN wget https://apachemirror.sg.wuchna.com/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz \
+#    && tar -xzf apache-maven-3.6.3-bin.tar.gz \
+#    && export PATH=$PATH:apache-maven-3.6.3/bin
+RUN ./compile.sh
+
+FROM alpine:latest
+
+LABEL MAINTAINER="Marthen Luther <marthen.luther@oracle.com>"
+
+ENV MYSQL_HOST=mysql \
+    VERSION=v0.9 \
+    DO_NOT_INITIALIZE=always \
+    ORACLE_SERVICE_NAME=ORCLPDB1.localdomain \
+    ORACLE_HOST=host.docker.internal \
+    GLIBC_REPO=https://github.com/sgerrand/alpine-pkg-glibc \
+    GLIBC_VERSION=2.29-r0 \
+    LANG=C.UTF-8
+
+RUN apk -U upgrade \
+        && apk add libstdc++ bash curl \
+        && for pkg in glibc-${GLIBC_VERSION} glibc-bin-${GLIBC_VERSION} glibc-i18n-${GLIBC_VERSION}; do curl -sSL ${GLIBC_REPO}/releases/download/${GLIBC_VERSION}/${pkg}.apk -o /tmp/${pkg}.apk; done \
+        && apk add --allow-untrusted /tmp/*.apk \
+        && rm -v /tmp/*.apk \
+        && echo "export LANG=C.UTF-8" > /etc/profile.d/locale.sh  \
+        && /usr/glibc-compat/sbin/ldconfig /lib /usr/glibc-compat/lib
+
+# Install psrecord
+ENV PYTHONUNBUFFERED=1
+RUN apk add --update --no-cache python3 && ln -sf python3 /usr/bin/python
+RUN python3 -m ensurepip
+RUN pip3 install --no-cache --upgrade pip setuptools
+RUN apk add --update --no-cache py3-psutil
+RUN rm -rf /var/cache/apk/*
+RUN pip install --upgrade pip
+RUN pip install psrecord
+
+EXPOSE 8080
+
+COPY --from=graalvm /home/vscode/petclinic/target/petclinic-jpa .
+
+ENTRYPOINT ["/petclinic-jpa"]
