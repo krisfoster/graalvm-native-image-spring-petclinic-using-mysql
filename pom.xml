@@ -8,6 +8,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
+        <!-- Was 2.4.0-M2 -->
         <version>2.4.0-M2</version>
     </parent>
 
@@ -117,10 +118,16 @@
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
         </dependency>
-        <dependency>
+        <!--dependency>
             <groupId>com.oracle.ojdbc</groupId>
             <artifactId>ojdbc8</artifactId>
             <version>19.3.0.0</version>
+        </dependency-->
+        <!-- Oracle JDBC driver -->
+        <dependency>
+            <groupId>com.oracle.ojdbc</groupId>
+            <artifactId>ojdbc11</artifactId>
+            <version>beta</version>
         </dependency>
 
         <!-- caching -->

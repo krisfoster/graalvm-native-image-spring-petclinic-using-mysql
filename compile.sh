@@ -36,16 +36,17 @@ echo "Compiling $ARTIFACT with $GRAALVM_VERSION"
   --allow-incomplete-classpath \
   -H:+TraceClassInitialization \
   -H:+ReportExceptionStackTraces \
-  -H:IncludeResourceBundles=oracle.net.jdbc.nl.mesg.NLSR,oracle.net.mesg.Message \
+  -H:IncludeResourceBundles=oracle.net.jdbc.nl.mesg.NLSR,oracle.net.mesg.Message,oracle.jdbc.driver.Messages \
 	--initialize-at-build-time=oracle.net.jdbc.nl.mesg.NLSR_en \
 	--initialize-at-build-time=oracle.jdbc.driver.DynamicByteArray,oracle.sql.ConverterArchive,oracle.sql.converter.CharacterConverterJDBC,oracle.sql.converter.CharacterConverter1Byte \
 	--initialize-at-run-time=java.sql.DriverManager \
-	--initialize-at-run-time=org.springframework.boot.context.properties.bind.Bindable \
   --initialize-at-build-time=java.awt.Toolkit \
   --initialize-at-build-time=sun.awt.AWTAccessor \
   -H:Name=$ARTIFACT \
   -Dspring.native.remove-yaml-support=true \
   -cp $CP $MAINCLASS >> output.txt ; } 2>> output.txt
+
+#--initialize-at-run-time=org.springframework.boot.context.properties.bind.Bindable \
 
 if [[ -f $ARTIFACT ]]
 then
