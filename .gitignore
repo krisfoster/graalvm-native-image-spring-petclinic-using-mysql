@@ -18,3 +18,8 @@ target/*
 _site/
 /reports/
 /lib/ojdbc11.jar
+reports/**/*.dat
+reports/**/*.png
+old-reports/*
+exes/*
+**/*.old
