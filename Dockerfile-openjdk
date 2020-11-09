@@ -4,6 +4,7 @@ ARG ORACLE_PORT=1521
 ARG ORACLE_HOST=host.docker.internal
 ARG ORACLE_SERVICE_NAME=orclpdb1.localdomain
 ARG DO_NOT_INITIALIZE=always
+ARG MAX_HEAP=200m
 
 ENV MYSQL_HOST=mysql \
     DO_NOT_INITIALIZE=$DO_NOT_INITIALIZE \
@@ -16,10 +17,8 @@ WORKDIR /home/app/petclinic
 
 COPY ./target/petclinic-jpa-0.0.1-SNAPSHOT.jar .
 
-
-RUN apk add --update alpine-sdk openssl-dev build-base
-
 # Install psrecord
+RUN apk add --update alpine-sdk openssl-dev build-base
 ENV PYTHONUNBUFFERED=1
 RUN apk add --update --no-cache python3 && ln -sf python3 /usr/bin/python
 RUN python3 -m ensurepip
@@ -30,4 +29,4 @@ RUN pip install --upgrade pip
 RUN pip install psrecord
 
 EXPOSE 8080
-ENTRYPOINT ["psrecord", "java -Xmx1G -jar ./petclinic-jpa-0.0.1-SNAPSHOT.jar", "--log", "/reports/profile.prof"]
+ENTRYPOINT ["psrecord", "java -Xmx150m -jar ./petclinic-jpa-0.0.1-SNAPSHOT.jar", "--log", "/reports/profile.prof"]

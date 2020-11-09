@@ -17,7 +17,7 @@ mvn -ntp package -DskipTests > target/native-image/output.txt
 JAR="$ARTIFACT-$VERSION.jar"
 rm -f $ARTIFACT
 echo "Unpacking $JAR"
-cd target/native-image
+cd target/native-image || exit
 jar -xvf ../$JAR >/dev/null 2>&1
 cp -R META-INF BOOT-INF/classes
 
@@ -58,4 +58,3 @@ else
   printf "${RED}FAILURE${NC}: an error occurred when compiling the native-image.\n"
   exit 1
 fi
-

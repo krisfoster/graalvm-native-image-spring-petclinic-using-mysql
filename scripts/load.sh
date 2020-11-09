@@ -11,11 +11,11 @@ rm /$REPORT_DIR/*-profplot.png
 echo "Load testing the openjdk petclinic..."
 THREADS=2
 CONNS=2
-DURRATION=30s
+DURRATION=120s
 
 # Warm up - try run for 5 mins
-wrk2 -t${THREADS} -c${CONNS} -d60s -R10 \
-      --latency http://localhost:8080/owners\?lastName\=
+#wrk2 -t${THREADS} -c${CONNS} -d60s -R10 \
+#      --latency http://localhost:8080/owners\?lastName\=
 
 # Run tests for 2 mins for better data
 for val in 5 10;

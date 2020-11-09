@@ -1,0 +1,24 @@
+#FROM oracle/graalvm-ce:20.2.0-java8 as graalvm
+FROM krisfoster/graal-ee-java11-ol:20.2.0 as graalvm
+
+USER vscode
+RUN mkdir -p /home/vscode/petclinic
+COPY . /home/vscode/petclinic
+WORKDIR /home/vscode/petclinic
+RUN sudo chown -R vscode:vscode /home/vscode/petclinic
+RUN export GRAALVM_HOME=/home/vscode/bin/graalvm-ee-java11-20.2.0 \
+    && export PATH=$PATH:/home/vscode/bin/graalvm-ee-java11-20.2.0/bin \
+    && native-image \
+    && sudo yum install -y oracle-epel-release-el7 \
+    && sudo yum update -y \
+    && sudo yum install -y --enablerepo ol7_optional_latest python3-devel \
+    && sudo pip3 install psrecord \
+    && ./compile-in-docker-g1gc.sh
+
+FROM frolvlad/alpine-glibc
+
+EXPOSE 8080
+
+COPY --from=graalvm /home/vscode/petclinic/target .
+
+ENTRYPOINT ["psrecord", "./petclinic-jpa -Xmx200m", "--log", "/reports/profile.prof"]
